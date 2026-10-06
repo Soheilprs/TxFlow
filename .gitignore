@@ -1,0 +1,18 @@
+# Build output
+bin/
+dist/
+
+# Environment
+.env
+.env.*
+
+# Test / coverage
+*.out
+coverage.out
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
