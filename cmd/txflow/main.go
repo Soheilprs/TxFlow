@@ -8,15 +8,15 @@ import (
 
 func main() {
 	tx := transaction.Transaction{
-		ID:          "tx-001",
-		AmountCents: 12549,
-		Status:      transaction.StatusPending,
+		ID:     "tx-001",
+		Amount: transaction.AmountCents(12549),
+		Status: transaction.StatusPending,
 	}
 
 	fmt.Printf(
 		"transaction=%s amount=%d status=%s\n",
 		tx.ID,
-		tx.AmountCents,
+		tx.Amount,
 		tx.Status,
 	)
 }

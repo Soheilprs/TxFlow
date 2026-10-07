@@ -1,6 +1,7 @@
 package transaction
 
 type Status string
+type AmountCents int64
 
 const (
 	StatusPending   Status = "pending"
@@ -9,7 +10,7 @@ const (
 )
 
 type Transaction struct {
-	ID          string
-	AmountCents int64
-	Status      Status
+	ID     string
+	Amount AmountCents
+	Status Status
 }
