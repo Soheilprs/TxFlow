@@ -7,10 +7,13 @@ import (
 )
 
 func main() {
-	tx := transaction.Transaction{
-		ID:     "tx-001",
-		Amount: transaction.AmountCents(12549),
-		Status: transaction.StatusPending,
+	tx, err := transaction.New(
+		"tx-001",
+		transaction.AmountCents(12549),
+	)
+	if err != nil {
+		fmt.Println("failed to create transaction:", err)
+		return
 	}
 
 	fmt.Printf(
