@@ -12,14 +12,19 @@ func main() {
 		transaction.AmountCents(12549),
 	)
 	if err != nil {
-		fmt.Println("failed to create transaction:", err)
+		fmt.Println(
+			"failed to create transaction:",
+			err,
+		)
 		return
 	}
 
+	id, amount, status := transaction.Details(tx)
+
 	fmt.Printf(
 		"transaction=%s amount=%d status=%s\n",
-		tx.ID,
-		tx.Amount,
-		tx.Status,
+		id,
+		amount,
+		status,
 	)
 }

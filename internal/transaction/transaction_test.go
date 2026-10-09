@@ -5,16 +5,16 @@ import "testing"
 func TestTransactionZeroValue(t *testing.T) {
 	var tx Transaction
 
-	if tx.ID != "" {
-		t.Fatalf("expected empty ID, got %q", tx.ID)
+	if tx.id != "" {
+		t.Fatalf("expected empty ID, got %q", tx.id)
 	}
 
-	if tx.Amount != 0 {
-		t.Fatalf("expected zero amount, got %d", tx.Amount)
+	if tx.amount != 0 {
+		t.Fatalf("expected zero amount, got %d", tx.amount)
 	}
 
-	if tx.Status != "" {
-		t.Fatalf("expected empty status, got %q", tx.Status)
+	if tx.status != "" {
+		t.Fatalf("expected empty status, got %q", tx.status)
 	}
 }
 
@@ -27,27 +27,27 @@ func TestNew(t *testing.T) {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	if tx.ID != "tx-001" {
+	if tx.id != "tx-001" {
 		t.Fatalf(
 			"expected ID %q, got %q",
 			"tx-001",
-			tx.ID,
+			tx.id,
 		)
 	}
 
-	if tx.Amount != AmountCents(12549) {
+	if tx.amount != AmountCents(12549) {
 		t.Fatalf(
 			"expected amount %d, got %d",
 			12549,
-			tx.Amount,
+			tx.amount,
 		)
 	}
 
-	if tx.Status != StatusPending {
+	if tx.status != StatusPending {
 		t.Fatalf(
 			"expected status %q, got %q",
 			StatusPending,
-			tx.Status,
+			tx.status,
 		)
 	}
 }
@@ -69,5 +69,41 @@ func TestNewRejectsNonPositiveAmount(t *testing.T) {
 	)
 	if err == nil {
 		t.Fatal("expected an error")
+	}
+}
+
+func TestDetails(t *testing.T) {
+	tx, err := New(
+		"tx-001",
+		AmountCents(12549),
+	)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	id, amount, status := Details(tx)
+
+	if id != "tx-001" {
+		t.Fatalf(
+			"expected ID %q, got %q",
+			"tx-001",
+			id,
+		)
+	}
+
+	if amount != AmountCents(12549) {
+		t.Fatalf(
+			"expected amount %d, got %d",
+			12549,
+			amount,
+		)
+	}
+
+	if status != StatusPending {
+		t.Fatalf(
+			"expected status %q, got %q",
+			StatusPending,
+			status,
+		)
 	}
 }

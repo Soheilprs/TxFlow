@@ -12,9 +12,9 @@ const (
 )
 
 type Transaction struct {
-	ID     string
-	Amount AmountCents
-	Status Status
+	id     string
+	amount AmountCents
+	status Status
 }
 
 func New(id string, amount AmountCents) (Transaction, error) {
@@ -27,10 +27,14 @@ func New(id string, amount AmountCents) (Transaction, error) {
 	}
 
 	tx := Transaction{
-		ID:     id,
-		Amount: amount,
-		Status: StatusPending,
+		id:     id,
+		amount: amount,
+		status: StatusPending,
 	}
 
 	return tx, nil
+}
+
+func Details(tx Transaction) (string, AmountCents, Status) {
+	return tx.id, tx.amount, tx.status
 }
