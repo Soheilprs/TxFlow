@@ -35,6 +35,22 @@ func New(id string, amount AmountCents) (Transaction, error) {
 	return tx, nil
 }
 
-func Details(tx Transaction) (string, AmountCents, Status) {
-	return tx.id, tx.amount, tx.status
+func (t Transaction) ID() string {
+	return t.id
+}
+
+func (t Transaction) Amount() AmountCents {
+	return t.amount
+}
+
+func (t Transaction) Status() Status {
+	return t.status
+}
+
+func (t Transaction) IsPending() bool {
+	return t.status == StatusPending
+}
+
+func (s Status) IsFinal() bool {
+	return s == StatusProcessed || s == StatusFailed
 }

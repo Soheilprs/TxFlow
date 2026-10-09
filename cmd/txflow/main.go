@@ -19,12 +19,12 @@ func main() {
 		return
 	}
 
-	id, amount, status := transaction.Details(tx)
+	// id, amount, status := transaction.Details(tx)
 
 	fmt.Printf(
 		"transaction=%s amount=%d status=%s\n",
-		id,
-		amount,
-		status,
+		tx.ID(),
+		tx.Amount(),
+		tx.Status(),
 	)
 }

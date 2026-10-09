@@ -15,29 +15,29 @@ func TestPublicTransactionAPI(t *testing.T) {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	id, amount, status := transaction.Details(tx)
+	// id, amount, status := transaction.Details(tx)
 
-	if id != "tx-public" {
+	if tx.ID() != "tx-public" {
 		t.Fatalf(
 			"expected ID %q, got %q",
 			"tx-public",
-			id,
+			tx.ID(),
 		)
 	}
 
-	if amount != transaction.AmountCents(5000) {
+	if tx.Amount() != transaction.AmountCents(5000) {
 		t.Fatalf(
 			"expected amount %d, got %d",
 			5000,
-			amount,
+			tx.Amount(),
 		)
 	}
 
-	if status != transaction.StatusPending {
+	if tx.Status() != transaction.StatusPending {
 		t.Fatalf(
 			"expected status %q, got %q",
 			transaction.StatusPending,
-			status,
+			tx.ID(),
 		)
 	}
 }

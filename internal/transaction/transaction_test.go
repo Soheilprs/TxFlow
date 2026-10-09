@@ -81,29 +81,43 @@ func TestDetails(t *testing.T) {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	id, amount, status := Details(tx)
+	// id, amount, status := Details(tx)
 
-	if id != "tx-001" {
+	if tx.ID() != "tx-001" {
 		t.Fatalf(
 			"expected ID %q, got %q",
 			"tx-001",
-			id,
+			tx.ID(),
 		)
 	}
 
-	if amount != AmountCents(12549) {
+	if tx.Amount() != AmountCents(12549) {
 		t.Fatalf(
 			"expected amount %d, got %d",
 			12549,
-			amount,
+			tx.Amount(),
 		)
 	}
 
-	if status != StatusPending {
+	if tx.Status() != StatusPending {
 		t.Fatalf(
 			"expected status %q, got %q",
 			StatusPending,
-			status,
+			tx.Status(),
 		)
+	}
+}
+
+func TestStatusIsFinal(t *testing.T) {
+	if StatusPending.IsFinal() {
+		t.Fatal("expected pending status not to be final")
+	}
+
+	if !StatusProcessed.IsFinal() {
+		t.Fatal("expected processed status to be final")
+	}
+
+	if !StatusFailed.IsFinal() {
+		t.Fatal("expected failed status to be final")
 	}
 }
