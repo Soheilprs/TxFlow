@@ -19,10 +19,23 @@ func main() {
 		return
 	}
 
-	// id, amount, status := transaction.Details(tx)
+	fmt.Printf(
+		"before: transaction=%s amount=%d status=%s\n",
+		tx.ID(),
+		tx.Amount(),
+		tx.Status(),
+	)
+
+	if err := tx.MarkProcessed(); err != nil {
+		fmt.Println(
+			"failed to process transaction:",
+			err,
+		)
+		return
+	}
 
 	fmt.Printf(
-		"transaction=%s amount=%d status=%s\n",
+		"after: transaction=%s amount=%d status=%s\n",
 		tx.ID(),
 		tx.Amount(),
 		tx.Status(),

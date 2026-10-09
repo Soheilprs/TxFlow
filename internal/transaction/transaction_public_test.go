@@ -41,3 +41,33 @@ func TestPublicTransactionAPI(t *testing.T) {
 		)
 	}
 }
+
+func TestPublicTransactionLifecycle(t *testing.T) {
+	tx, err := transaction.New(
+		"tx-public",
+		transaction.AmountCents(5000),
+	)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if !tx.IsPending() {
+		t.Fatal("expected transaction to be pending")
+	}
+
+	if err := tx.MarkProcessed(); err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if tx.Status() != transaction.StatusProcessed {
+		t.Fatalf(
+			"expected status %q, got %q",
+			transaction.StatusProcessed,
+			tx.Status(),
+		)
+	}
+
+	if !tx.Status().IsFinal() {
+		t.Fatal("expected processed transaction to be final")
+	}
+}

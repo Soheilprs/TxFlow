@@ -54,3 +54,23 @@ func (t Transaction) IsPending() bool {
 func (s Status) IsFinal() bool {
 	return s == StatusProcessed || s == StatusFailed
 }
+
+func (t *Transaction) MarkProcessed() error {
+	if t.status.IsFinal() {
+		return errors.New("cannot process a transaction in a final state.")
+	}
+
+	t.status = StatusProcessed
+
+	return nil
+}
+
+func (t *Transaction) MarkFailed() error {
+	if t.status.IsFinal() {
+		return errors.New("cannot dail a transaction in a final state.")
+	}
+
+	t.status = StatusFailed
+
+	return nil
+}

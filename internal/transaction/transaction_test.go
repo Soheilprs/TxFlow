@@ -121,3 +121,68 @@ func TestStatusIsFinal(t *testing.T) {
 		t.Fatal("expected failed status to be final")
 	}
 }
+
+func TestMarkProcessed(t *testing.T) {
+	tx, err := New(
+		"tx-001",
+		AmountCents(12549),
+	)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	err = tx.MarkProcessed()
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if tx.Status() != StatusProcessed {
+		t.Fatalf(
+			"expected status %q, got %q",
+			StatusProcessed,
+			tx.Status(),
+		)
+	}
+}
+
+func TestMarkProcessedRejectsFinalTransaction(t *testing.T) {
+	tx, err := New(
+		"tx-001",
+		AmountCents(12549),
+	)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if err := tx.MarkProcessed(); err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	err = tx.MarkProcessed()
+	if err == nil {
+		t.Fatal("expected an error")
+	}
+}
+
+func TestMarkFailed(t *testing.T) {
+	tx, err := New(
+		"tx-001",
+		AmountCents(12549),
+	)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	err = tx.MarkFailed()
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if tx.Status() != StatusFailed {
+		t.Fatalf(
+			"expected status %q, got %q",
+			StatusFailed,
+			tx.Status(),
+		)
+	}
+}
