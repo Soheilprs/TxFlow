@@ -1,6 +1,9 @@
 package transaction
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestTransactionZeroValue(t *testing.T) {
 	var tx Transaction
@@ -49,26 +52,6 @@ func TestNew(t *testing.T) {
 			StatusPending,
 			tx.status,
 		)
-	}
-}
-
-func TestNewRejectsEmptyID(t *testing.T) {
-	_, err := New(
-		"",
-		AmountCents(12549),
-	)
-	if err == nil {
-		t.Fatal("expected an error")
-	}
-}
-
-func TestNewRejectsNonPositiveAmount(t *testing.T) {
-	_, err := New(
-		"tx-001",
-		AmountCents(0),
-	)
-	if err == nil {
-		t.Fatal("expected an error")
 	}
 }
 
@@ -145,25 +128,6 @@ func TestMarkProcessed(t *testing.T) {
 	}
 }
 
-func TestMarkProcessedRejectsFinalTransaction(t *testing.T) {
-	tx, err := New(
-		"tx-001",
-		AmountCents(12549),
-	)
-	if err != nil {
-		t.Fatalf("expected no error, got %v", err)
-	}
-
-	if err := tx.MarkProcessed(); err != nil {
-		t.Fatalf("expected no error, got %v", err)
-	}
-
-	err = tx.MarkProcessed()
-	if err == nil {
-		t.Fatal("expected an error")
-	}
-}
-
 func TestMarkFailed(t *testing.T) {
 	tx, err := New(
 		"tx-001",
@@ -183,6 +147,67 @@ func TestMarkFailed(t *testing.T) {
 			"expected status %q, got %q",
 			StatusFailed,
 			tx.Status(),
+		)
+	}
+}
+
+func TestNewRejectsEmptyID(t *testing.T) {
+	_, err := New(
+		"",
+		AmountCents(12549),
+	)
+
+	if !errors.Is(err, ErrEmptyID) {
+		t.Fatalf(
+			"expected ErrEmptyID, got %v",
+			err,
+		)
+	}
+}
+
+func TestNewRejectsNonPositiveAmount(
+	t *testing.T,
+) {
+	_, err := New(
+		"tx-001",
+		AmountCents(0),
+	)
+
+	if !errors.Is(err, ErrInvalidAmount) {
+		t.Fatalf(
+			"expected ErrInvalidAmount, got %v",
+			err,
+		)
+	}
+}
+
+func TestMarkProcessedRejectsFinalTransaction(
+	t *testing.T,
+) {
+	tx, err := New(
+		"tx-001",
+		AmountCents(12549),
+	)
+	if err != nil {
+		t.Fatalf(
+			"expected no error, got %v",
+			err,
+		)
+	}
+
+	if err := tx.MarkProcessed(); err != nil {
+		t.Fatalf(
+			"expected no error, got %v",
+			err,
+		)
+	}
+
+	err = tx.MarkProcessed()
+
+	if !errors.Is(err, ErrFinalState) {
+		t.Fatalf(
+			"expected ErrFinalState, got %v",
+			err,
 		)
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Soheilprs/TxFlow/internal/transaction"
@@ -12,10 +13,32 @@ func main() {
 		transaction.AmountCents(12549),
 	)
 	if err != nil {
-		fmt.Println(
-			"failed to create transaction:",
+		switch {
+		case errors.Is(
 			err,
-		)
+			transaction.ErrEmptyID,
+		):
+			fmt.Println(
+				"invalid transaction ID:",
+				err,
+			)
+
+		case errors.Is(
+			err,
+			transaction.ErrInvalidAmount,
+		):
+			fmt.Println(
+				"invalid transaction amount:",
+				err,
+			)
+
+		default:
+			fmt.Println(
+				"failed to create transaction:",
+				err,
+			)
+		}
+
 		return
 	}
 

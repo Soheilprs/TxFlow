@@ -1,6 +1,8 @@
 package transaction
 
-import "errors"
+import (
+	"fmt"
+)
 
 type Status string
 type AmountCents int64
@@ -19,11 +21,11 @@ type Transaction struct {
 
 func New(id string, amount AmountCents) (Transaction, error) {
 	if id == "" {
-		return Transaction{}, errors.New("transaction ID must not be empty")
+		return Transaction{}, ErrEmptyID
 	}
 
 	if amount <= 0 {
-		return Transaction{}, errors.New("transaction amount must be greater than zero")
+		return Transaction{}, ErrInvalidAmount
 	}
 
 	tx := Transaction{
@@ -57,7 +59,7 @@ func (s Status) IsFinal() bool {
 
 func (t *Transaction) MarkProcessed() error {
 	if t.status.IsFinal() {
-		return errors.New("cannot process a transaction in a final state.")
+		return fmt.Errorf("mark transaction processed: %w", ErrFinalState)
 	}
 
 	t.status = StatusProcessed
@@ -67,7 +69,7 @@ func (t *Transaction) MarkProcessed() error {
 
 func (t *Transaction) MarkFailed() error {
 	if t.status.IsFinal() {
-		return errors.New("cannot dail a transaction in a final state.")
+		return fmt.Errorf("mark transaction failed: %w", ErrFinalState)
 	}
 
 	t.status = StatusFailed

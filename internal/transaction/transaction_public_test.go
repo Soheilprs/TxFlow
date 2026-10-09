@@ -1,6 +1,7 @@
 package transaction_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/Soheilprs/TxFlow/internal/transaction"
@@ -69,5 +70,22 @@ func TestPublicTransactionLifecycle(t *testing.T) {
 
 	if !tx.Status().IsFinal() {
 		t.Fatal("expected processed transaction to be final")
+	}
+}
+
+func TestPublicErrors(t *testing.T) {
+	_, err := transaction.New(
+		"",
+		transaction.AmountCents(5000),
+	)
+
+	if !errors.Is(
+		err,
+		transaction.ErrEmptyID,
+	) {
+		t.Fatalf(
+			"expected ErrEmptyID, got %v",
+			err,
+		)
 	}
 }
