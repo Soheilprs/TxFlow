@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Println("txflow failed:", err)
+	}
+}
+
+func run() error {
 	tx, err := transaction.New(
 		"tx-001",
 		transaction.AmountCents(12549),
@@ -18,8 +24,8 @@ func main() {
 			err,
 			transaction.ErrEmptyID,
 		):
-			fmt.Println(
-				"invalid transaction ID:",
+			return fmt.Errorf(
+				"invalid transaction ID: %w",
 				err,
 			)
 
@@ -27,19 +33,17 @@ func main() {
 			err,
 			transaction.ErrInvalidAmount,
 		):
-			fmt.Println(
-				"invalid transaction amount:",
+			return fmt.Errorf(
+				"invalid transaction amount: %w",
 				err,
 			)
 
 		default:
-			fmt.Println(
-				"failed to create transaction:",
+			return fmt.Errorf(
+				"create transaction: %w",
 				err,
 			)
 		}
-
-		return
 	}
 
 	fmt.Printf(
@@ -50,11 +54,11 @@ func main() {
 	)
 
 	if err := tx.MarkProcessed(); err != nil {
-		fmt.Println(
-			"failed to process transaction:",
+		return fmt.Errorf(
+			"process transaction %s: %w",
+			tx.ID(),
 			err,
 		)
-		return
 	}
 
 	fmt.Printf(
@@ -63,4 +67,6 @@ func main() {
 		tx.Amount(),
 		tx.Status(),
 	)
+
+	return nil
 }
