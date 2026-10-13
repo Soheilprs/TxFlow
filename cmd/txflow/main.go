@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/Soheilprs/TxFlow/internal/store"
 	"github.com/Soheilprs/TxFlow/internal/transaction"
 )
 
@@ -19,6 +20,8 @@ func main() {
 }
 
 func run() error {
+	memoryStore := store.NewMemoryStore()
+
 	inputs := []transactionInput{
 		{
 			id:     "tx-001",
@@ -33,12 +36,6 @@ func run() error {
 			amount: transaction.AmountCents(9999),
 		},
 	}
-
-	transactions := make(
-		[]transaction.Transaction,
-		0,
-		len(inputs),
-	)
 
 	for _, input := range inputs {
 		tx, err := transaction.New(
@@ -74,14 +71,17 @@ func run() error {
 			}
 		}
 
-		transactions = append(
-			transactions,
-			tx,
-		)
+		memoryStore.Save(tx)
 	}
 
-	for i := range transactions {
-		tx := &transactions[i]
+	for _, input := range inputs {
+		tx, ok := memoryStore.Get(input.id)
+		if !ok {
+			return fmt.Errorf(
+				"transaction %s not found",
+				input.id,
+			)
+		}
 
 		fmt.Printf(
 			"before: transaction=%s amount=%d status=%s\n",
@@ -97,6 +97,8 @@ func run() error {
 				err,
 			)
 		}
+
+		memoryStore.Save(tx)
 
 		fmt.Printf(
 			"after: transaction=%s amount=%d status=%s\n",
