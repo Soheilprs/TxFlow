@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/Soheilprs/TxFlow/internal/processor"
 	"github.com/Soheilprs/TxFlow/internal/store"
 	"github.com/Soheilprs/TxFlow/internal/transaction"
 )
@@ -21,6 +22,8 @@ func main() {
 
 func run() error {
 	memoryStore := store.NewMemoryStore()
+
+	txProcessor := processor.New(memoryStore)
 
 	inputs := []transactionInput{
 		{
@@ -78,7 +81,7 @@ func run() error {
 		tx, ok := memoryStore.Get(input.id)
 		if !ok {
 			return fmt.Errorf(
-				"transaction %s not found",
+				"transaction %s not found before processing",
 				input.id,
 			)
 		}
@@ -90,21 +93,18 @@ func run() error {
 			tx.Status(),
 		)
 
-		if err := tx.MarkProcessed(); err != nil {
-			return fmt.Errorf(
-				"process transaction %s: %w",
-				tx.ID(),
-				err,
-			)
+		processedTx, err := txProcessor.Process(
+			input.id,
+		)
+		if err != nil {
+			return err
 		}
-
-		memoryStore.Save(tx)
 
 		fmt.Printf(
 			"after: transaction=%s amount=%d status=%s\n",
-			tx.ID(),
-			tx.Amount(),
-			tx.Status(),
+			processedTx.ID(),
+			processedTx.Amount(),
+			processedTx.Status(),
 		)
 	}
 
