@@ -104,3 +104,75 @@ func TestProcessorRejectsMissingTransaction(
 		)
 	}
 }
+
+func TestProcessorCreatesTransaction(
+	t *testing.T,
+) {
+	fake := newFakeStore()
+
+	p := New(fake)
+
+	tx, err := p.Create(
+		"tx-001",
+		transaction.AmountCents(12549),
+	)
+	if err != nil {
+		t.Fatalf(
+			"create transaction: %v",
+			err,
+		)
+	}
+
+	if tx.ID() != "tx-001" {
+		t.Fatalf(
+			"expected ID %q, got %q",
+			"tx-001",
+			tx.ID(),
+		)
+	}
+
+	stored, ok := fake.Get("tx-001")
+	if !ok {
+		t.Fatal(
+			"expected transaction to be stored",
+		)
+	}
+
+	if stored.ID() != tx.ID() {
+		t.Fatalf(
+			"expected stored ID %q, got %q",
+			tx.ID(),
+			stored.ID(),
+		)
+	}
+}
+
+func TestProcessorRejectsInvalidAmount(
+	t *testing.T,
+) {
+	fake := newFakeStore()
+
+	p := New(fake)
+
+	_, err := p.Create(
+		"tx-001",
+		transaction.AmountCents(0),
+	)
+
+	if !errors.Is(
+		err,
+		transaction.ErrInvalidAmount,
+	) {
+		t.Fatalf(
+			"expected ErrInvalidAmount, got %v",
+			err,
+		)
+	}
+
+	_, ok := fake.Get("tx-001")
+	if ok {
+		t.Fatal(
+			"expected invalid transaction not to be stored",
+		)
+	}
+}

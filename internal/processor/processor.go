@@ -47,3 +47,14 @@ func (p *Processor) Process(
 
 	return tx, nil
 }
+
+func (p *Processor) Create(id string, amount transaction.AmountCents) (transaction.Transaction, error) {
+	tx, err := transaction.New(id, amount)
+	if err != nil {
+		return transaction.Transaction{}, fmt.Errorf("create transaction: %w", err)
+	}
+
+	p.store.Save(tx)
+
+	return tx, nil
+}

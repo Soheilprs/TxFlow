@@ -23,7 +23,9 @@ func main() {
 func run() error {
 	memoryStore := store.NewMemoryStore()
 
-	txProcessor := processor.New(memoryStore)
+	txProcessor := processor.New(
+		memoryStore,
+	)
 
 	inputs := []transactionInput{
 		{
@@ -41,7 +43,7 @@ func run() error {
 	}
 
 	for _, input := range inputs {
-		tx, err := transaction.New(
+		tx, err := txProcessor.Create(
 			input.id,
 			input.amount,
 		)
@@ -74,18 +76,6 @@ func run() error {
 			}
 		}
 
-		memoryStore.Save(tx)
-	}
-
-	for _, input := range inputs {
-		tx, ok := memoryStore.Get(input.id)
-		if !ok {
-			return fmt.Errorf(
-				"transaction %s not found before processing",
-				input.id,
-			)
-		}
-
 		fmt.Printf(
 			"before: transaction=%s amount=%d status=%s\n",
 			tx.ID(),
@@ -94,10 +84,14 @@ func run() error {
 		)
 
 		processedTx, err := txProcessor.Process(
-			input.id,
+			tx.ID(),
 		)
 		if err != nil {
-			return err
+			return fmt.Errorf(
+				"process transaction %s: %w",
+				tx.ID(),
+				err,
+			)
 		}
 
 		fmt.Printf(
