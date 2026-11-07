@@ -1,6 +1,8 @@
 package store
 
 import (
+	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/Soheilprs/TxFlow/internal/transaction"
@@ -91,4 +93,57 @@ func TestMemoryStoreStoresTransactionValue(
 			stored.Status(),
 		)
 	}
+}
+
+func TestMemoryStoreConcurrentAccess(
+	t *testing.T,
+) {
+	s := NewMemoryStore()
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < 1000; i++ {
+		i := i
+
+		wg.Go(func() {
+			id := fmt.Sprintf(
+				"tx-%d",
+				i,
+			)
+
+			tx, err := transaction.New(
+				id,
+				transaction.AmountCents(i+1),
+			)
+			if err != nil {
+				t.Errorf(
+					"create transaction %s: %v",
+					id,
+					err,
+				)
+				return
+			}
+
+			s.Save(tx)
+
+			stored, ok := s.Get(id)
+			if !ok {
+				t.Errorf(
+					"expected %s to exist",
+					id,
+				)
+				return
+			}
+
+			if stored.ID() != id {
+				t.Errorf(
+					"expected ID %q, got %q",
+					id,
+					stored.ID(),
+				)
+			}
+		})
+	}
+
+	wg.Wait()
 }
